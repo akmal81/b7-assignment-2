@@ -1,20 +1,13 @@
-import { NextFunction, Request, RequestHandler, Response } from "express";
-import sendRes from "./sendRes";
+import {RequestHandler} from "express";
+import { Next, Req, Res } from "../types";
 
-export const catchAsync = (fn:RequestHandler)=>{
-    return async (req:Request, res:Response, next:NextFunction) => {
+export const catchAsync = (fn: RequestHandler) => {
+    return async (req: Req, res: Res, next: Next) => {
 
         try {
             await fn(req, res, next)
-        } catch (error:any) {
-            sendRes(res,{
-                statusCode:   error.statusCode || 500,
-                success:false,
-                message:error.message || "Internal Server Error",
-                data:null,
-                error:error
-            }) 
+        } catch (error) {
             next(error)
-        } 
+        }
     }
 }

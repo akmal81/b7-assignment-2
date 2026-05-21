@@ -1,7 +1,8 @@
-import { Response } from "express";
+
+import { Res } from "../types";
 import { IResponse } from "../types/response.type";
 
-const sendRes =<T> (res:Response, data:IResponse<T>) =>{
+const sendRes =<T> (res:Res, data:IResponse<T>) =>{
 
 res.status(data.statusCode).json(
     {
