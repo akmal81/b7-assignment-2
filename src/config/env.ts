@@ -11,6 +11,7 @@ dotenv.config(
 const config = {
     prot: process.env.PORT,
     connStr:process.env.CONNECTION_STRING,
+    secret:process.env.JWT_SECRET
 };
 
 
