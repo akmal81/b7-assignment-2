@@ -1,6 +1,6 @@
 import express from "express";
 import { IndexRoutes } from "./router";
-import { globalErrorHandler } from "./errorHandller/globalErrorHandler";
+import { globalErrorHandler } from "./errorHandler/globalErrorHandler";
 const app = express();
 
 app.use(express.json())

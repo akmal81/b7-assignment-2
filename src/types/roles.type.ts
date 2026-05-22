@@ -1,6 +1,4 @@
-export const UserRoles = {
-    contributor : 'contributor',
-    maintainer: 'maintainer'
-}
+import { UserRoles } from "../constant/userRole";
+
 
 export type UserRoles =typeof UserRoles[keyof typeof UserRoles];

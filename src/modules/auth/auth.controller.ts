@@ -5,33 +5,33 @@ import { authService } from "./auth.service";
 import sendRes from "../../utils/sendRes";
 import { StatusCodes } from "http-status-codes";
 
-const signupUser =catchAsync(
-    async (req:Req, res:Res) => {
+const signupUser = catchAsync(
+    async (req: Req, res: Res) => {
         const result = await authService.signupUser(req.body);
-        sendRes(res, {
+        return sendRes(res, {
             statusCode: StatusCodes.OK,
-            success:true,
-            message:"User registered successfully",
-            data:result.rows[0]
+            success: true,
+            message: "User registered successfully",
+            data: result.rows[0]
         })
     }
 )
 
 
 const loginUser = catchAsync(
-    async (req:Req, res:Res) => {
+    async (req: Req, res: Res) => {
         const result = await authService.loginUser(req.body);
-        sendRes(res, {
+        return sendRes(res, {
             statusCode: StatusCodes.OK,
-            success:true,
-            message:"Login Successfull",
-            data:result
+            success: true,
+            message: "Login Successfull",
+            data: result
         })
     }
 )
 
 
-export const authController ={
+export const authController = {
     signupUser,
     loginUser
 }

@@ -1,7 +1,7 @@
 import bcrypt from "bcryptjs";
 import { pool } from "../../db/schema"
 import { ILoginUser, ISignupUser } from "./auth.interface";
-import { AppError } from "../../errorHandller/appErrorHandller";
+import { AppError } from "../../errorHandler/appErrorHandler";
 import jwt from "jsonwebtoken";
 import config from "../../config/env";
 import { StatusCodes } from "http-status-codes";
@@ -49,6 +49,7 @@ const loginUser = async (payload: ILoginUser) => {
     const jwtPayload = {
         id: user.id,
         name: user.name,
+        email:user.email,
         role: user.role
     }
 

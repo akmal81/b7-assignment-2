@@ -4,6 +4,7 @@ import sendRes from "../utils/sendRes";
 import jwt, { JwtPayload } from "jsonwebtoken"
 import config from "../config/env";
 import { pool } from "../db/schema";
+import { StatusCodes } from "http-status-codes";
 
 
 const auth = (...roles: UserRoles[]) => {
@@ -11,15 +12,14 @@ const auth = (...roles: UserRoles[]) => {
 
         try {
             const token = req.headers.authorization;
+
             if (!token) {
-                sendRes(res, {
-                    statusCode: 500,
+                return sendRes(res, {
+                    statusCode: StatusCodes.UNAUTHORIZED,
                     success: false,
                     message: "Unauthorized access. Token missing!",
                 })
             }
-
-
 
 
             const decoded = jwt.verify(
@@ -31,33 +31,34 @@ const auth = (...roles: UserRoles[]) => {
                 SELECT * FROM users WHERE email = $1
                 `, [decoded.email]);
 
-            const user = userInfo.rows[0];
-
 
             if (userInfo.rows.length === 0) {
-                sendRes(res, {
-                    statusCode: 404,
+                return sendRes(res, {
+                    statusCode: StatusCodes.FORBIDDEN,
                     success: false,
                     message: "Unauthorized: Invalid user account",
                 })
             }
 
+            const user = userInfo.rows[0];
+
             req.user = decoded;
 
             if (roles.length && !roles.includes(user.role)) {
-                sendRes(res, {
-                    statusCode: 404,
+                return sendRes(res, {
+                    statusCode:StatusCodes.FORBIDDEN,
                     success: false,
                     message: "Forbidden: Invalid user account",
                 })
 
             }
-
-
             next()
         } catch (error) {
             next(error)
         }
 
     }
-}
+};
+
+
+export default auth;

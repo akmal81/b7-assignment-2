@@ -1,7 +1,7 @@
 export interface IResponse <T>{
     statusCode:number;
     success:boolean;
-    message:string;
+    message?:string;
     data?:T;
     error?:any
 }
