@@ -3,7 +3,7 @@ import { Req, Res } from "../../types";
 import { catchAsync } from "../../utils/catchAsync";
 import { issueService } from "./issues.service";
 import sendRes from "../../utils/sendRes";
-import { IUpdateIssue } from "./issues.interface";
+import { IIssueQuery, IUpdateIssue } from "./issues.interface";
 
 const createIssue = catchAsync(
     async (req: Req, res: Res) => {
@@ -29,11 +29,13 @@ const createIssue = catchAsync(
 
 const getAllIssue = catchAsync(
     async (req: Req, res: Res) => {
-        const result = await issueService.getAllIssue();
+
+        const queryParams:IIssueQuery = req.query
+        const result = await issueService.getAllIssue(queryParams);
         return sendRes(res, {
             statusCode: StatusCodes.OK,
             success: true,
-            // data: result.rows[0]
+            data: result
         })
 
     }
@@ -57,18 +59,18 @@ const getSingleIssue = catchAsync(
 
 const updateIssue = catchAsync(
     async (req: Req, res: Res) => {
-        
+
         const role = req.user.role;
         const userId = req.user.id;
 
-        const payload:IUpdateIssue = {
-            issueId:req.params.id as string,
+        const payload: IUpdateIssue = {
+            issueId: req.params.id as string,
             title: req.body.title,
             description: req.body.description,
-            type:req.body.type,
-            status:req.body.status,
+            type: req.body.type,
+            status: req.body.status,
             userRole: req.user.role,
-            userId:req.user.id
+            userId: req.user.id
         }
 
 
@@ -76,13 +78,30 @@ const updateIssue = catchAsync(
         return sendRes(res, {
             statusCode: StatusCodes.OK,
             success: true,
-             message: "Issue updated successfully",
+            message: "Issue updated successfully",
             data: result
         })
 
     }
 );
-const deleteIssue = {};
+
+
+const deleteIssue = catchAsync(
+    async (req: Req, res: Res) => {
+
+        const { id } = req.params;
+        const { role } = req.user;
+
+        await  issueService.deleteIssue(id as string, role);
+
+        return sendRes(res, {
+            statusCode: StatusCodes.OK,
+            success: true,
+            message: "Issue deleted successfully",
+        })
+
+    }
+);
 export const issueController = {
     createIssue,
     getAllIssue,

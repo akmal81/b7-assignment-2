@@ -1,7 +1,8 @@
 import { StatusCodes } from "http-status-codes";
 import { pool } from "../../db/schema";
 import { AppError } from "../../errorHandler/appErrorHandler";
-import { IIssue, IUpdateIssue } from "./issues.interface"
+import { IIssue, IIssueQuery, IIssueRes, IReporter, IUpdateIssue, Status, Type } from "./issues.interface"
+import { UserRoles } from "../../types";
 
 const createIssue = async (payload: IIssue) => {
     const { title, description, type, reporter_id } = payload;
@@ -16,16 +17,86 @@ const createIssue = async (payload: IIssue) => {
 }
 
 
-const getAllIssue = async () => {
+const getAllIssue = async (queryParams: IIssueQuery) => {
 
-    const issueData = await pool.query(`
-            SELECT * FROM issues 
-        `);
+    const { sort = 'newest', type, status } = queryParams;
 
-    const users = await pool.query(`SELECT * FROM users`)
+    let selectStatement = 'SELECT * FROM issues';
+    const typeStatus = [];
+    const whereCondition = [];
 
-    console.log(issueData.rows);
+    // if filter by type 
+    if (type) {
 
+        typeStatus.push(type);
+        whereCondition.push(`type = $${typeStatus.length}`)   // $${typeStatus.length} = $1
+
+    }
+
+
+    // if filter by status
+
+    if (status) {
+
+        typeStatus.push(status);
+        whereCondition.push(`type = $${typeStatus.length}`)
+    }
+
+
+    // where clasue 
+
+    if (whereCondition.length > 0) {
+        selectStatement += ' WHERE ' + whereCondition.join(' AND ')
+    }
+
+
+    // sorting 
+
+
+    if (sort === 'oldest') {
+        selectStatement += ' ORDER BY created_at ASC ';
+
+    } else {
+        selectStatement += ' ORDER BY created_at ASC '
+    }
+
+
+    const issuesResult = await pool.query(selectStatement, typeStatus)
+    const issues = issuesResult.rows;
+
+    if (issues.length === 0) {
+        throw new AppError(StatusCodes.NOT_FOUND, "No Issues Found!!")
+    }
+
+    const reporterId = Array.from(new Set(issues.map(i => i.reporter_id)));
+
+    const reporterIdForIN = reporterId.map((_, idx) => `$${idx + 1}`).join(', ')
+
+    const userQuery = `SELECT id, name, role FROM users WHERE id IN (${reporterIdForIN})`
+
+    const usersResult = await pool.query(userQuery, reporterId)
+
+    const users: IReporter[] = usersResult.rows;
+
+    const userMap: Record<number, IReporter> = users.reduce((acc, user) => {
+        acc[user.id] = user;
+        return acc;
+    }, {} as Record<number, IReporter>);
+
+
+
+    const formattedIssues: IIssueRes[] = issues.map((issue) => ({
+        id: issue.id,
+        title: issue.title,
+        description: issue.description,
+        type: issue.type,
+        status: issue.status,
+        reporter: userMap[issue.reporter_id] || null,
+        created_at: issue.created_at,
+        updated_at: issue.updated_at,
+    }));
+
+    return formattedIssues
 
 }
 
@@ -108,7 +179,22 @@ const updateIssue = async (payload: IUpdateIssue) => {
 }
 
 
-const deleteIssue = async () => { }
+const deleteIssue = async (issueId: string, role: UserRoles) => {
+
+    const isIssueExists = await pool.query(`SELECT * FROM issues WHERE id = $1`, [issueId]);
+
+    if (!isIssueExists) {
+        throw new AppError(StatusCodes.NOT_FOUND, "Issue not found")
+    }
+
+    if (role !== 'maintainer') {
+        throw new AppError(StatusCodes.UNAUTHORIZED, "Only maintainer can delete Issue!!!")
+    }
+
+    return await pool.query(`DELETE FROM issues WHERE id = $1`, [issueId]);
+
+
+}
 
 export const issueService = {
     createIssue,

@@ -5,7 +5,7 @@ const type = {
     feature_request: 'feature_request'
 } as const
 
-type Type = typeof type[keyof typeof type];
+export type Type = typeof type[keyof typeof type];
 
 
 const status = {
@@ -14,7 +14,7 @@ const status = {
     resolved: 'resolved'
 }
 
-type Status = typeof status[keyof typeof status]
+export type Status = typeof status[keyof typeof status]
 
 export interface IIssue {
     title: string;
@@ -24,7 +24,15 @@ export interface IIssue {
     reporter_id: number;
 }
 
+// get All issue 
 
+
+
+
+
+
+
+// update issue
 export interface IUpdateIssue {
     issueId: string;
     title: string;
@@ -34,4 +42,30 @@ export interface IUpdateIssue {
     userRole: UserRoles;
     userId: number
 
+}
+
+
+
+
+export type IIssueQuery = {
+    sort?: 'newest' | 'oldest';
+    type?: Type;
+    status?: Status;
+}
+
+export interface IReporter {
+    id: number;
+    name: string;
+    role: 'contributor' | 'maintainer';
+}
+
+export interface IIssueRes {
+    id: number;
+    title: string;
+    description: string;
+    type: Type;
+    status: Status;
+    reporter: IReporter | null;
+    created_at: Date;
+    updated_at: Date
 }
