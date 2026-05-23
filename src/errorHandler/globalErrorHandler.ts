@@ -1,3 +1,4 @@
+import { StatusCodes } from "http-status-codes";
 import { Next, Req, Res } from "../types";
 
 export const globalErrorHandler = (
@@ -7,7 +8,7 @@ export const globalErrorHandler = (
     next: Next,
 ) => {
 
-    const statusCode = error.statusCode || 500;
+    const statusCode = error.statusCode || StatusCodes.INTERNAL_SERVER_ERROR;
     const message = error.message || "Internal Server Error";
 
     return res.status(statusCode).json(
