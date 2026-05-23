@@ -85,18 +85,21 @@ Follow these steps to run the DevPulse server locally on your machine:
 1. Clone the Repository
 
 git clone https://github.com/akmal81/b7-assignment-2.git
+
+```
 cd b7-assignment-2
+```
 
 
 2. Install Project Dependencies
+```
 npm install
+```
 
 
 
 3. Setup Environment Variables
 Create a .env file in the root directory and append the following configurations:
-
-
 
 ```
 PORT=5000
@@ -109,11 +112,11 @@ BCRYPT_SALT_ROUNDS=10
 
 4. Build and Run the Application
 
-# Run in Development mode
+##### Run in Development mode
 ```npm run dev```
 
-# Build the TypeScript codebase
+##### Build the TypeScript codebase
 ```npm run build```
 
-# Start the compiled Production code
+##### Start the compiled Production code
 ```npm run start```
