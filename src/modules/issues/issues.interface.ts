@@ -47,10 +47,15 @@ export interface IUpdateIssue {
 
 
 
+// export type IIssueQuery = {
+//     sort?: 'newest' | 'oldest';
+//     type?: Type;
+//     status?: Status;
+// }
 export type IIssueQuery = {
     sort?: 'newest' | 'oldest';
-    type?: Type;
-    status?: Status;
+    type?: "bug" | "feature_request";
+    status?: "open" | "in_progress" | "resolved";
 }
 
 export interface IReporter {

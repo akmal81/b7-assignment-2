@@ -21,6 +21,8 @@ const getAllIssue = async (queryParams: IIssueQuery) => {
 
     const { sort = 'newest', type, status } = queryParams;
 
+
+
     let selectStatement = 'SELECT * FROM issues';
     const typeStatus = [];
     const whereCondition = [];
@@ -39,7 +41,7 @@ const getAllIssue = async (queryParams: IIssueQuery) => {
     if (status) {
 
         typeStatus.push(status);
-        whereCondition.push(`type = $${typeStatus.length}`)
+        whereCondition.push(`status = $${typeStatus.length}`)
     }
 
 
@@ -57,7 +59,7 @@ const getAllIssue = async (queryParams: IIssueQuery) => {
         selectStatement += ' ORDER BY created_at ASC ';
 
     } else {
-        selectStatement += ' ORDER BY created_at ASC '
+        selectStatement += ' ORDER BY created_at DESC '
     }
 
 
@@ -155,9 +157,9 @@ const updateIssue = async (payload: IUpdateIssue) => {
         }
     }
 
-    const newTitle = payload.title || issue.title;
-    const newDescription = payload.description || issue.description;
-    const newType = payload.type || issue.type
+    const newTitle = title || issue.title;
+    const newDescription = description || issue.description;
+    const newType = type || issue.type
 
 
 
